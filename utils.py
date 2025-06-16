@@ -7,7 +7,7 @@ from glob import glob
 import shutil
 import requests
 import tarfile
-
+from tqdm.auto import tqdm
 
 import numpy as np
 import torch
@@ -133,15 +133,12 @@ class Preprocess:
             self.time_masking_para = time_masking_para
             self.frequency_mask_num = frequency_mask_num
             self.time_mask_num = time_mask_num
-            print(
-                "frequency specaug %d %d" % (self.frequency_mask_num, self.frequency_masking_para)
-            )
-            print("time specaug %d %d" % (self.time_mask_num, self.time_masking_para))
+            
 
     def __call__(self, x, labels, augment=True, noise_prob=0.8, is_train=True):
         assert len(x.shape) == 3
         if augment:
-            for idx in range(x.shape[0]):
+            for idx in tqdm(range(x.shape[0])):
                 if labels[idx] != 0 and (not is_train or random.random() > noise_prob):
                     continue
                 noise_amp = (
@@ -222,7 +219,6 @@ def DownloadDataset(loc, url):
             read_so_far = f.tell()
             if total_size > 0:
                 percent = read_so_far * 100 / total_size
-                print(f"Downloaded {read_so_far} of {total_size} bytes ({percent:.2f}%)")
     with tarfile.open(os.path.join(loc, filename), "r:gz") as tar:
         tar.extractall(loc)
 
@@ -244,7 +240,6 @@ def make_12class_dataset(base, target):
         if class_name in class10:
             target_dir = os.path.join(target, class_name)
             shutil.copytree(clsdir, target_dir)
-            print(f"Copied {clsdir} to {target_dir}")
         else:
             for file_path in glob(os.path.join(clsdir, "*")):
                 filename = os.path.basename(file_path)
@@ -252,7 +247,6 @@ def make_12class_dataset(base, target):
                 os.makedirs(target_dir, exist_ok=True)
                 target_file = os.path.join(target_dir, class_name + "_" + filename)
                 shutil.copy(file_path, target_file)
-                print(f"Copied {file_path} to {target_file}")
 
 def split_data(base, target, valid_list, test_list):
     with open(valid_list, "r") as f:
