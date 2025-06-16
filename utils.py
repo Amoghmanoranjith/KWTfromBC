@@ -285,7 +285,6 @@ def split_data(base, target, valid_list, test_list):
                 target_dir = trg_base_dirs[0]
             target_path = os.path.join(target_dir, trg_file_name)
             shutil.copy(org_file_name, target_path)
-            print(f"Copied {org_file_name} to {target_path}")
 
 
 def SplitDataset(loc):
