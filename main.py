@@ -1,6 +1,5 @@
 # Copyright (c) 2023 Qualcomm Technologies, Inc.
 # All Rights Reserved.
-
 import os
 from argparse import ArgumentParser
 import shutil
@@ -16,6 +15,7 @@ from tqdm import tqdm
 from bcresnet import BCResNets
 from utils import DownloadDataset, Padding, Preprocess, SpeechCommand, SplitDataset
 
+from model import PatchProjection, KWSTransformer
 
 class Trainer:
     def __init__(self):
@@ -182,8 +182,29 @@ class Trainer:
         Private method that loads the model into the object.
         """
         print("model: BC-ResNet-%.1f on data v0.0%d" % (self.tau, self.ver))
-        self.model = BCResNets(int(self.tau * 8)).to(self.device)
-
+        self.patcher = PatchProjection(40, 64)
+        self.encoder = KWSTransformer(
+        num_patches = 101,
+        num_layers = 12, 
+        num_classes = 35,
+        d_model = 64,
+        num_heads = 1,
+        mlp_dim=256,
+        channels=3,
+        dropout=0.0,
+        prenorm=False,
+        distill_token=False,
+        approximate_gelu=False,
+        rotary = False,          #change this here
+        res_attn = False,
+        selective_attn = False,
+        use_dynamic_tanh = False)
+        self.decoder = nn.Linear(in_features = 64, out_features = 12)
+        self.model = nn.Sequential(
+            self.patcher,
+            self.encoder,
+            self.decoder
+        )
 
 if __name__ == "__main__":
     _trainer = Trainer()
