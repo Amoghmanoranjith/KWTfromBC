@@ -138,7 +138,7 @@ class Preprocess:
     def __call__(self, x, labels, augment=True, noise_prob=0.8, is_train=True):
         assert len(x.shape) == 3
         if augment:
-            for idx in tqdm(range(x.shape[0])):
+            for idx in range(x.shape[0]):
                 if labels[idx] != 0 and (not is_train or random.random() > noise_prob):
                     continue
                 noise_amp = (
