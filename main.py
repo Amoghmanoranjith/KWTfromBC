@@ -28,9 +28,6 @@ class Trainer:
         parser.add_argument(
             "--ver", default=1, help="google speech command set version 1 or 2", type=int
         )
-        parser.add_argument(
-            "--tau", default=1, help="model size", type=float, choices=[1, 1.5, 2, 3, 6, 8]
-        )
         parser.add_argument("--gpu", default=0, help="gpu device id", type=int)
         parser.add_argument("--download", help="download data", action="store_true")
         args = parser.parse_args()
